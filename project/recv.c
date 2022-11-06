@@ -15,6 +15,6 @@ int main() {
     int bytes = recv(client, recv_buffer, BUFF_LEN, 0);
     printf("%d %s\n", bytes, recv_buffer);
     close_socket(client);
-    close_socket(host);
+    close_socket(host);//
     return 0;
 }
