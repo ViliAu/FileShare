@@ -1,3 +1,5 @@
+all: send recv
+
 recv: connector.o filehandler.o
 	gcc recv.c -o recv connector.o filehandler.o -lWs2_32
 
