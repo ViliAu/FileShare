@@ -30,6 +30,7 @@ int main(int argc, char **argv) {
     }
 
     initialize_winsocks();
+    printf("Trying to connect to address %s ...\n", ip);
     client = create_client_socket(ip, DEFAULT_PORT, 1, 1);
 
     long size = calc_file_size(input);

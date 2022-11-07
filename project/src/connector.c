@@ -36,7 +36,6 @@ SOCKET create_client_socket(char* address, char* port, int tcp, int ipv4) {
 
     // Resolve the server address and port
     int initResult = 0;
-    printf("\n\n%s\n\n", address);
     initResult = getaddrinfo(address, port, &hints, &result);
     if (initResult != 0) {
         printf("getaddrinfo failed: %d\n", initResult);

@@ -3,7 +3,8 @@
         "winsock2.h": "c",
         "ws2tcpip.h": "c",
         "stdlib.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "connector.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }
