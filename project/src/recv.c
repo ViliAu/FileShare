@@ -25,11 +25,10 @@ int main() {
 
     // Print details
     printf("Downloading %s - %s\n", file_name, file_size);
-    free(file_name);
     free(file_size);
 
     // Open file output
-    FILE *output = fopen("output", "wb");
+    FILE *output = fopen(file_name, "wb");
     if (output == NULL) {
         perror("Error opening file");
         close_socket(client);
@@ -37,6 +36,7 @@ int main() {
         fclose(output);
         return 1;
     }
+    free(file_name);
 
     long progress = 0;
     unsigned char buffer[BUFF_LEN];
@@ -71,12 +71,17 @@ SOCKET init_conn() {
 long wait_for_file_size(SOCKET s) {
     long l;
     int bytes = recv(s, (char*)&l, BUFF_LEN, 0);
+    printf("Bytes: %d\n", bytes);
     return l;
 }
 
 void wait_for_file_name(SOCKET s, char** dest_ptr) {
-    unsigned char buffer[256];
+    unsigned char buffer[512] = {0};
     int bytes = recv(s, buffer, BUFF_LEN, 0);
-    *dest_ptr = malloc(bytes);
+    printf("Bytes: %d\n", bytes);
+    printf("Buffer: %s\n", buffer);
+    printf("Malloc: %d\n", strlen(buffer)+1);
+    *dest_ptr = malloc(strlen(buffer)+1);
     strcpy(*dest_ptr, buffer);
+    printf("Name: %s\n", *dest_ptr);
 }
