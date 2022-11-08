@@ -43,7 +43,6 @@ int main() {
     int bytes_received = 0;
     unsigned char buffer[BUFF_LEN];
     long start = time(NULL);
-    printf("taas");
     while((bytes_received = (recv_chunk(client, buffer, BUFF_LEN))) > 0) {
         fwrite(buffer, 1, bytes_received, output);
         progress += bytes_received;
@@ -90,8 +89,8 @@ int recv_chunk(SOCKET s, char* buffer, int buffer_size) {
     while(i < buffer_size) {
         lc++;
         int recv_bytes = recv(s, &buffer[i], buffer_size, 0);
-        //printf("%d\n", recv_bytes);
-        if (recv_bytes < 0 || lc > 10000) {
+        printf("%d\n", recv_bytes);
+        if (recv_bytes <= 0 || lc > 10000) {
             return i;
         }
         i += recv_bytes;
