@@ -2,6 +2,8 @@
 #include "connector.h"
 #include "filehandler.h"
 
+
+
 SOCKET init_conn();
 long wait_for_file_size(SOCKET s);
 void wait_for_file_name(SOCKET s, char** dest_ptr);
@@ -46,15 +48,17 @@ int main() {
     }
     free(file_name);
 
-    long progress = 0;
+    long progress = size;
     int bytes_received = 0;
     unsigned char buffer[BUFF_LEN];
     long start = time(NULL);
-    while((bytes_received = (recv_chunk(client, buffer, BUFF_LEN))) > 0) {
+    while(progress > 0) {
+        bytes_received = (recv_chunk(client, buffer, BUFF_LEN));
+
         fwrite(buffer, 1, bytes_received, output);
-        progress += bytes_received;
+        progress -= bytes_received;
         if (time(NULL) > start) {
-            printf("\rReceiving files, %.2f%%", (double)((double)progress / (double)size * 100));
+            printf("\rReceiving files, %.2f%%", ((double)(size-progress) / (double)size * 100));
             start = time(NULL);
         }
     }

@@ -45,21 +45,18 @@ int main(int argc, char **argv) {
     printf("Sending %s - %s\n", file_name, file_size);
     free(file_size);
 
-    long progress = 0;
+    long progress = size;
     long start = time(NULL);
     int bytes_read = 0;
     unsigned char buffer[BUFF_LEN];
-    while ((bytes_read = fread(buffer, 1, sizeof(buffer), input)) > 0) {
+    /* TODO Cleanup */
+    while (size > 0) {
+        int bytes_read = fread(buffer, 1, min(BUFF_LEN, size), input);
         int i = send_chunk(buffer, bytes_read);
-        //int i = send(client, buffer, sizeof(buffer), 0);
-        if (i == -1) {
-            printf("Sending failed!");
-            close_application(1);
-        }
 
-        progress += bytes_read;
+        progress -= i;
         if (time(NULL) > start) {
-            printf("\rSending files, %.2f%%", (double)((double)progress / (double)size * 100));
+            printf("\rSending files, %.2f%%", ((double)(size-progress) / (double)size * 100));
             start = time(NULL);
         }
     }
@@ -108,7 +105,7 @@ void close_application(int errcode) {
 int send_chunk(char* buffer, int buffer_size) {
     int i = 0;
     while (i < buffer_size) {
-        int bytes = send(client, &buffer[i], buffer_size -i, 0);
+        int bytes = send(client, &buffer[i], min(BUFF_LEN, buffer_size - i), 0);
         printf("%d\n", bytes);
         if (bytes < 0) {
             printf("Error sending data to server. Terminating.\n");
