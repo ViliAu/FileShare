@@ -19,3 +19,12 @@ char* trunc_file_size(long file_size, char** str_ptr) {
     *str_ptr = malloc(len + 1);
     snprintf(*str_ptr, len + 1, "%.2f%s", calc_size, extensions[i]);
 }
+
+int check_file_exists(char* fname) {
+    FILE *file;
+    if ((file = fopen(fname, "r"))) {
+        fclose(file);
+        return 0;
+    }
+    return 1;
+}

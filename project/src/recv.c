@@ -28,6 +28,13 @@ int main() {
     printf("Downloading %s - %s\n", file_name, file_size);
     free(file_size);
 
+    // Check if file exists
+    /*char file_copy[256];
+    strcat(file_copy, file_name);
+    if (check_file_exists(file_name)) {
+        strcat(file_copy, " (copy)");
+    }*/
+
     // Open file output
     FILE *output = fopen(file_name, "wb");
     if (output == NULL) {

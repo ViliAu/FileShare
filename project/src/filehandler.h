@@ -8,5 +8,6 @@
 
     long calc_file_size(FILE *f);
     char* trunc_file_size(long file_size, char** str_ptr);
+    int check_file_exists(char* fname);
 
 #endif
