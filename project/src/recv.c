@@ -40,11 +40,13 @@ int main() {
     free(file_name);
 
     long progress = 0;
+    int bytes_received = 0;
     unsigned char buffer[BUFF_LEN];
     long start = time(NULL);
-    while((recv(client, buffer, BUFF_LEN, 0)) > 0) {
-        fwrite(buffer, 1, sizeof(buffer), output);
-        progress += sizeof(buffer);
+    printf("taas");
+    while((bytes_received = (recv_chunk(client, buffer, BUFF_LEN))) > 0) {
+        fwrite(buffer, 1, bytes_received, output);
+        progress += bytes_received;
         if (time(NULL) > start) {
             printf("\rReceiving files, %.2f%%", (double)((double)progress / (double)size * 100));
             start = time(NULL);
@@ -84,10 +86,13 @@ void wait_for_file_name(SOCKET s, char** dest_ptr) {
 
 int recv_chunk(SOCKET s, char* buffer, int buffer_size) {
     int i = 0;
+    int lc = 0; // Loop count
     while(i < buffer_size) {
+        lc++;
         int recv_bytes = recv(s, &buffer[i], buffer_size, 0);
-        if (recv_bytes < 0) {
-            return recv_bytes;
+        //printf("%d\n", recv_bytes);
+        if (recv_bytes < 0 || lc > 10000) {
+            return i;
         }
         i += recv_bytes;
     }
