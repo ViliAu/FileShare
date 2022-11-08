@@ -4,7 +4,7 @@
 char* get_file_name(char* path);
 void send_file_size(long file_size);
 void send_filename(char* fname);
-void send_file();
+int send_chunk(char* buffer, int buffer_size);
 void close_application(int errcode);
 
 static SOCKET client;
@@ -47,15 +47,17 @@ int main(int argc, char **argv) {
 
     long progress = 0;
     long start = time(NULL);
+    int bytes_read = 0;
     unsigned char buffer[BUFF_LEN];
-    while (fread(buffer, 1, sizeof(buffer), input) > 0) {
-        int i = send(client, buffer, sizeof(buffer), 0);
+    while ((bytes_read = fread(buffer, 1, sizeof(buffer), input)) > 0) {
+        int i = send_chunk(buffer, bytes_read);
+        //int i = send(client, buffer, sizeof(buffer), 0);
         if (i == -1) {
             printf("Sending failed!");
             close_application(1);
         }
 
-        progress += sizeof(buffer);
+        progress += bytes_read;
         if (time(NULL) > start) {
             printf("\rSending files, %.2f%%", (double)((double)progress / (double)size * 100));
             start = time(NULL);
@@ -102,3 +104,16 @@ void close_application(int errcode) {
     fclose(input);
     exit(errcode);
 }
+
+int send_chunk(char* buffer, int buffer_size) {
+    int i = 0;
+    while (i < buffer_size) {
+        int bytes = send(client, &buffer[i], buffer_size -i, 0);
+        if (bytes < 0) {
+            printf("Error sending data to server. Terminating.\n");
+            close_application(1);
+        }
+        i += bytes;
+    }
+    return i;
+} 

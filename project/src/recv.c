@@ -5,6 +5,7 @@
 SOCKET init_conn();
 long wait_for_file_size(SOCKET s);
 void wait_for_file_name(SOCKET s, char** dest_ptr);
+int recv_chunk(SOCKET s, char* buffer, int buffer_size);
 
 int main() {
     initialize_winsocks();
@@ -79,4 +80,16 @@ void wait_for_file_name(SOCKET s, char** dest_ptr) {
     int bytes = recv(s, buffer, BUFF_LEN, 0);
     *dest_ptr = malloc(strlen(buffer)+1);
     strcpy(*dest_ptr, buffer);
+}
+
+int recv_chunk(SOCKET s, char* buffer, int buffer_size) {
+    int i = 0;
+    while(i < buffer_size) {
+        int recv_bytes = recv(s, &buffer[i], buffer_size, 0);
+        if (recv_bytes < 0) {
+            return recv_bytes;
+        }
+        i += recv_bytes;
+    }
+    return i;
 }
