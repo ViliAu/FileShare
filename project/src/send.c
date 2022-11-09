@@ -62,9 +62,8 @@ int main(int argc, char **argv) {
         }
     }*/
     while (progress < size) {
-        int bytes_read = fread(buffer, 1, BUFF_LEN, input);
-        int bytes_sent = send(client, buffer, bytes_read, 0);
-
+        int bytes_read = fread(buffer, 1, min(BUFF_LEN, size-progress), input);
+        int bytes_sent = send_chunk(buffer, bytes_read);
         progress += bytes_sent;
         if (time(NULL) > start) {
             printf("\rSending files, %.2f%%", ((double)(progress) / (double)size * 100));
@@ -124,9 +123,9 @@ int send_chunk(char* buffer, int buffer_size) {
             printf("Error sending data to server. Terminating.\n");
             close_application(1);
         }
-        /*int bytes_passed;
+        int bytes_passed;
         bytes = recv(client, (char*)&bytes_passed, BUFF_LEN, 0);
-        printf("Bytes actually passed: %d\n", bytes_passed);*/
+        printf("Bytes actually passed: %d\n", bytes_passed);
         i += bytes;
     }
     return i;
