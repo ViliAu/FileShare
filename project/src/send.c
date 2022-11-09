@@ -113,7 +113,10 @@ int send_chunk(char* buffer, int buffer_size) {
             printf("Error sending data to server. Terminating.\n");
             close_application(1);
         }
-        i += bytes;
+        int bytes_passed;
+        bytes = recv(client, (char*)&bytes_passed, BUFF_LEN, 0);
+        printf("Bytes actually passed: %d\n", bytes_passed);
+        i += bytes_passed;
     }
     return i;
 } 

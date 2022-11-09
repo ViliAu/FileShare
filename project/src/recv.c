@@ -102,13 +102,14 @@ int recv_chunk(SOCKET s, char* buffer, int buffer_size) {
     int lc = 0; // Loop count
     while(i < buffer_size) {
         lc++;
-        int recv_bytes = recv(s, buffer, BUFF_LEN, 0);
+        int recv_bytes = recv(s, &buffer[i], BUFF_LEN, 0);
         if (lc == 1 || lc % 10 == 0) {
             printf("Bytes received: %d\n", recv_bytes);
         }
         if (recv_bytes <= 0 || lc > 100) {
             return i;
         }
+        int sent_bytes = send(s, (char *)&recv_bytes, sizeof(int), 0);
         i += recv_bytes;
     }
     return i;
