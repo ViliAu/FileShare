@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
     unsigned char buffer[BUFF_LEN];
     /* TODO Cleanup */
     /*while (progress > 0) {
-        int bytes_read = fread(buffer, 1, min(BUFF_LEN, size), input);
+        int bytes_read = fread(buffer, 1, BUFF_LEN, input);
         int i = send_chunk(buffer, bytes_read);
 
         progress -= i;
@@ -70,8 +70,10 @@ int main(int argc, char **argv) {
             printf("\rSending files, %.2f%%", ((double)(progress) / (double)size * 100));
             start = time(NULL);
         }
-        memset(buffer, 0, sizeof(buffer));
     }
+    printf("Waiting for res...\n");
+    char i[1];
+    int bytes = recv(client, i, BUFF_LEN, 0);
     printf("Done.\n");
 
     close_application(0);
@@ -116,7 +118,7 @@ int send_chunk(char* buffer, int buffer_size) {
     printf("bufsize: %d\n", buffer_size);
     int i = 0;
     while (i < buffer_size) {
-        int bytes = send(client, &buffer[i], min(BUFF_LEN, buffer_size - i), 0);
+        int bytes = send(client, &buffer[i], buffer_size-i, 0);
         printf("Bytes sent: %d\n", bytes);
         if (bytes < 0) {
             printf("Error sending data to server. Terminating.\n");

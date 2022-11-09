@@ -69,22 +69,25 @@ int main() {
     */
 
     while(progress < size) {
-        bytes_received = recv(client, buffer, BUFF_LEN, 0);
+        bytes_received = recv_chunk(client, buffer, min(BUFF_LEN, size-progress));
         if(bytes_received <= 0) {
             if (bytes_received < 0) {
                 printf("Error at socket(): %ld\n", WSAGetLastError());
             }
             break;
         }
-        fwrite(buffer, 1, bytes_received, output);
+        if (fwrite(buffer, 1, bytes_received, output) == -1) {
+            perror("Error writing to file");
+            break;
+        };
         progress += bytes_received;
         if (time(NULL) > start) {
             printf("\rReceiving files, %.2f%%", ((double)(progress) / (double)size * 100));
             start = time(NULL);
         }
-        memset(buffer, 0, sizeof(buffer));
+        //memset(buffer, 0, sizeof(buffer));
     }
-
+    int bytes = send(client, (char*)1, 1, 0);
     printf("\rReceiving files, 100%%    \n");
     close_socket(client);
     close_socket(host);
@@ -122,12 +125,12 @@ int recv_chunk(SOCKET s, char* buffer, int buffer_size) {
     //int lc = 0;
     while(i < buffer_size) {
         //lc++;
-        int recv_bytes = recv(s, &buffer[i], BUFF_LEN, 0);
+        int recv_bytes = recv(s, &buffer[i], buffer_size, 0);
         printf("Bytes received: %d\n", recv_bytes);
         if (recv_bytes < 0) {
             return recv_bytes;
         }
-        int sent_bytes = send(s, (char *)&recv_bytes, sizeof(int), 0);
+        //int sent_bytes = send(s, (char *)&recv_bytes, sizeof(int), 0);
         i += recv_bytes;
     }
     return i;
