@@ -54,7 +54,8 @@ int main() {
     long start = time(NULL);
     while(progress > 0) {
         bytes_received = (recv_chunk(client, buffer, BUFF_LEN*2));
-        if(bytes_received <= 0) {
+        if(bytes_received < 0) {
+            printf("Error at socket(): %ld\n", WSAGetLastError());
             break;
         }
         fwrite(buffer, 1, bytes_received, output);
