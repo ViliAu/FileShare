@@ -104,7 +104,7 @@ int recv_chunk(SOCKET s, char* buffer, int buffer_size) {
         lc++;
         int recv_bytes = recv(s, &buffer[i], buffer_size, 0);
         printf("%d\n", recv_bytes);
-        if (recv_bytes < 0 || lc > 10000) {
+        if (recv_bytes <= 0 || lc > 100) {
             return i;
         }
         i += recv_bytes;

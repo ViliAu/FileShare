@@ -50,11 +50,12 @@ int main(int argc, char **argv) {
     int bytes_read = 0;
     unsigned char buffer[BUFF_LEN];
     /* TODO Cleanup */
-    while (size > 0) {
+    while (progress > 0) {
         int bytes_read = fread(buffer, 1, min(BUFF_LEN, size), input);
         int i = send_chunk(buffer, bytes_read);
 
         progress -= i;
+        printf("%d\n", progress);
         if (time(NULL) > start) {
             printf("\rSending files, %.2f%%", ((double)(size-progress) / (double)size * 100));
             start = time(NULL);
@@ -62,7 +63,7 @@ int main(int argc, char **argv) {
     }
     // Send terminating packet
     send(client, 0, 0, 0);
-    printf("\rSending files, 100%%    \n");
+    printf("Done.\n");
 
     close_application(0);
 }
