@@ -82,6 +82,7 @@ int main() {
             printf("\rReceiving files, %.2f%%", ((double)(progress) / (double)size * 100));
             start = time(NULL);
         }
+        memset(buffer, 0, sizeof(buffer));
     }
 
     printf("\rReceiving files, 100%%    \n");
