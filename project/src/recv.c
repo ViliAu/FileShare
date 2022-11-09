@@ -77,9 +77,10 @@ int main() {
             break;
         }
         fwrite(buffer, 1, bytes_received, output);
+        printf("%d\n", bytes_received);
         progress += bytes_received;
         if (time(NULL) > start) {
-            printf("\rReceiving files, %.2f%%", ((double)(size-progress) / (double)size * 100));
+            printf("\rReceiving files, %.2f%%", ((double)(progress) / (double)size * 100));
             start = time(NULL);
         }
     }
