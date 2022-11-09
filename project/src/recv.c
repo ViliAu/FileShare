@@ -90,7 +90,7 @@ long wait_for_file_size(SOCKET s) {
 }
 
 void wait_for_file_name(SOCKET s, char** dest_ptr) {
-    unsigned char buffer[512] = {0};
+    unsigned char buffer[BUFF_LEN] = {0};
     int bytes = recv(s, buffer, BUFF_LEN, 0);
     *dest_ptr = malloc(strlen(buffer)+1);
     strcpy(*dest_ptr, buffer);

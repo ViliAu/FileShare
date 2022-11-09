@@ -37,7 +37,7 @@
 	#define DEFAULT_PORT "6666"
 	#define DEFAULT_ADDR "127.0.0.1"
 	#define MAX_CONNECTIONS 1 /* maximum length of the queue of pending connections to accept */
-	#define BUFF_LEN 512
+	#define BUFF_LEN 128
 
 	/* Contains information about windows sockets implementation */
 	static WSADATA wsaData;
