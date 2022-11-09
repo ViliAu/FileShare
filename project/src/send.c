@@ -66,17 +66,11 @@ int main(int argc, char **argv) {
         int bytes_sent = send(client, buffer, bytes_read, 0);
 
         progress += bytes_sent;
-        printf("%d\n", progress);
         if (time(NULL) > start) {
             printf("\rSending files, %.2f%%", ((double)(progress) / (double)size * 100));
             start = time(NULL);
         }
     }
-    printf("done lähetys");
-    
-    // Send terminating packet
-    //send(client, 0, 0, 0);
-    recv(client, buffer, BUFF_LEN, 0);
     printf("Done.\n");
 
     close_application(0);

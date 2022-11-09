@@ -77,7 +77,6 @@ int main() {
             break;
         }
         fwrite(buffer, 1, bytes_received, output);
-        printf("%d\n", bytes_received);
         progress += bytes_received;
         if (time(NULL) > start) {
             printf("\rReceiving files, %.2f%%", ((double)(progress) / (double)size * 100));
@@ -86,7 +85,6 @@ int main() {
     }
 
     printf("\rReceiving files, 100%%    \n");
-    send(client, 0, 0, 0);
     close_socket(client);
     close_socket(host);
     fclose(output);
