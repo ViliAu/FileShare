@@ -54,10 +54,9 @@ int main() {
     long start = time(NULL);
     while(progress > 0) {
         bytes_received = (recv_chunk(client, buffer, BUFF_LEN));
-        if(bytes_received < 0) {
+        if(bytes_received <= 0) {
             break;
         }
-
         fwrite(buffer, 1, bytes_received, output);
         progress -= bytes_received;
         if (time(NULL) > start) {
@@ -99,11 +98,14 @@ void wait_for_file_name(SOCKET s, char** dest_ptr) {
 
 int recv_chunk(SOCKET s, char* buffer, int buffer_size) {
     int i = 0;
+    printf("buffer: %d\n", buffer_size);
     int lc = 0; // Loop count
     while(i < buffer_size) {
         lc++;
-        int recv_bytes = recv(s, &buffer[i], buffer_size, 0);
-        printf("%d\n", recv_bytes);
+        int recv_bytes = recv(s, &buffer[i], min(buffer_size, BUFF_LEN), 0);
+        if (lc == 1 || lc % 10 == 0) {
+            printf("%d\n", recv_bytes);
+        }
         if (recv_bytes <= 0 || lc > 100) {
             return i;
         }

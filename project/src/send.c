@@ -104,10 +104,11 @@ void close_application(int errcode) {
 }
 
 int send_chunk(char* buffer, int buffer_size) {
+    printf("bufsize: %d\n", buffer_size);
     int i = 0;
     while (i < buffer_size) {
         int bytes = send(client, &buffer[i], min(BUFF_LEN, buffer_size - i), 0);
-        printf("%d\n", bytes);
+        printf("Bytes sent: %d\n", bytes);
         if (bytes < 0) {
             printf("Error sending data to server. Terminating.\n");
             close_application(1);
