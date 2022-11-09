@@ -50,10 +50,10 @@ int main() {
 
     long progress = size;
     int bytes_received = 0;
-    unsigned char buffer[BUFF_LEN];
+    unsigned char buffer[BUFF_LEN*2];
     long start = time(NULL);
     while(progress > 0) {
-        bytes_received = (recv_chunk(client, buffer, BUFF_LEN));
+        bytes_received = (recv_chunk(client, buffer, BUFF_LEN*2));
         if(bytes_received <= 0) {
             break;
         }
@@ -99,14 +99,12 @@ void wait_for_file_name(SOCKET s, char** dest_ptr) {
 int recv_chunk(SOCKET s, char* buffer, int buffer_size) {
     int i = 0;
     printf("buffer: %d\n", buffer_size);
-    int lc = 0; // Loop count
+    //int lc = 0;
     while(i < buffer_size) {
-        lc++;
-        int recv_bytes = recv(s, &buffer[i], BUFF_LEN, 0);
-        if (lc == 1 || lc % 10 == 0) {
-            printf("Bytes received: %d\n", recv_bytes);
-        }
-        if (recv_bytes <= 0 || lc > 100) {
+        //lc++;
+        int recv_bytes = recv(s, buffer, BUFF_LEN*2, 0);
+        printf("Bytes received: %d\n", recv_bytes);
+        if (recv_bytes <= 0) {
             return i;
         }
         int sent_bytes = send(s, (char *)&recv_bytes, sizeof(int), 0);
