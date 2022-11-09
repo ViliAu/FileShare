@@ -63,6 +63,7 @@ int main(int argc, char **argv) {
     }
     // Send terminating packet
     send(client, 0, 0, 0);
+    recv(client, buffer, BUFF_LEN, 0);
     printf("Done.\n");
 
     close_application(0);

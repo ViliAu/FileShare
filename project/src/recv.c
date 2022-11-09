@@ -50,7 +50,7 @@ int main() {
 
     long progress = size;
     int bytes_received = 0;
-    unsigned char buffer[BUFF_LEN*2];
+    unsigned char buffer[BUFF_LEN];
     long start = time(NULL);
     while(progress > 0) {
         bytes_received = (recv_chunk(client, buffer, BUFF_LEN*2));
@@ -65,7 +65,7 @@ int main() {
         }
     }
     printf("\rReceiving files, 100%%    \n");
-
+    send(client, 0, 0, 0);
     close_socket(client);
     close_socket(host);
     fclose(output);
@@ -102,9 +102,9 @@ int recv_chunk(SOCKET s, char* buffer, int buffer_size) {
     //int lc = 0;
     while(i < buffer_size) {
         //lc++;
-        int recv_bytes = recv(s, buffer, BUFF_LEN*2, 0);
+        int recv_bytes = recv(s, &buffer[i], BUFF_LEN, 0);
         printf("Bytes received: %d\n", recv_bytes);
-        if (recv_bytes <= 0) {
+        if (recv_bytes < 0) {
             return i;
         }
         int sent_bytes = send(s, (char *)&recv_bytes, sizeof(int), 0);
