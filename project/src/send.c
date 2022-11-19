@@ -124,8 +124,7 @@ int send_chunk(char* buffer, int buffer_size) {
             printf("Error sending data to server. Terminating.\n");
             close_application(1);
         }
-        int bytes_passed;
-        tot += bytes_passed;
+        tot += bytes;
     }
     return tot;
 } 
