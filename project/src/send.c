@@ -126,7 +126,7 @@ int send_chunk(char* buffer, int buffer_size) {
         int bytes_passed;
         bytes = recv(client, (char*)&bytes_passed, BUFF_LEN, 0);
         printf("Bytes actually passed: %d\n", bytes_passed);
-        i += bytes;
+        i += bytes_passed;
     }
     return i;
 } 
