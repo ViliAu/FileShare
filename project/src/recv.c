@@ -69,7 +69,8 @@ int main() {
     */
 
     while(progress < size) {
-        bytes_received = recv_chunk(client, buffer, min(BUFF_LEN, size-progress));
+        //bytes_received = recv_chunk(client, buffer, min(BUFF_LEN, size-progress));
+        int bytes_received = recv(client, buffer, min(BUFF_LEN, size-progress), 0);
         if(bytes_received <= 0) {
             if (bytes_received < 0) {
                 printf("Error at socket(): %ld\n", WSAGetLastError());
