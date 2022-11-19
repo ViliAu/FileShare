@@ -82,6 +82,7 @@ int main() {
             break;
         };
         progress += bytes_received;
+        printf("%d\n, progress");
         if (time(NULL) > start) {
             printf("\rReceiving files, %.2f%%", ((double)(progress) / (double)size * 100));
             start = time(NULL);

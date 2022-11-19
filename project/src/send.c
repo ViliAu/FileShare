@@ -61,6 +61,7 @@ int main(int argc, char **argv) {
             start = time(NULL);
         }
     }*/
+    Sleep(1000);
     while (progress < size) {
         int bytes_read = fread(buffer, 1, min(BUFF_LEN, size-progress), input);
         int bytes_sent = send_chunk(buffer, bytes_read);
