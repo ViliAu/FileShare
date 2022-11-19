@@ -1,11 +1,14 @@
 #include "connector.h"
 #include "filehandler.h"
+#include <time.h>
 
+#define CLOCK_INTERVAL 1000
 char* get_file_name(char* path);
 void send_file_size(long file_size);
 void send_filename(char* fname);
 int send_chunk(char* buffer, int buffer_size);
 void close_application(int errcode);
+float calc_remaining_time(int size, int progress, int last_progress, long time);
 
 static SOCKET client;
 static FILE* input;
@@ -45,25 +48,35 @@ int main(int argc, char **argv) {
     printf("Sending %s - %s\n", file_name, file_size);
     free(file_size);
 
+    time_t start, stop;
     long progress = 0;
-    long start = time(NULL);
+    long last_progress = 0;
     int bytes_read = 0;
+    int bytes_sent = 0;
     unsigned char buffer[BUFF_LEN];
 
     Sleep(1000);
+    start = clock();
+    stop = clock();
     while (progress < size) {
-        int bytes_read = fread(buffer, 1, min(BUFF_LEN, size-progress), input);
-        int bytes_sent = send_chunk(buffer, bytes_read);
+        bytes_read = fread(buffer, 1, min(BUFF_LEN, size-progress), input);
+        bytes_sent = send_chunk(buffer, bytes_read);
         progress += bytes_sent;
-        if (time(NULL) > start) {
-            printf("\rSending files, %.2f%%", ((double)(progress) / (double)size * 100));
-            start = time(NULL);
+        if (clock() > (stop + CLOCK_INTERVAL)) {
+            float remaining_time = calc_remaining_time(size, progress, last_progress, clock() - stop);
+            printf("\rSending files, %.2f%%, estimated time: %.2fs                      ", ((double)(progress) / (double)size * 100), remaining_time);
+            stop = clock();
+            last_progress = progress;
         }
     }
-    printf("Waiting for res...\n");
+    stop = clock();
+    printf("\rSending files, 100%%\n                                                     ");
+    printf("Elapsed time: %.2fs", (stop-start)*0.001);
+    printf("Waiting for server ack...\n");
     char i[1];
     int bytes = recv(client, i, BUFF_LEN, 0);
-    printf("Done.\n");
+    printf("Press enter to quit...");
+    getchar();
 
     close_application(0);
 }
@@ -104,11 +117,9 @@ void close_application(int errcode) {
 }
 
 int send_chunk(char* buffer, int buffer_size) {
-    //printf("bufsize: %d\n", buffer_size);
     int tot = 0;
     while (tot < buffer_size) {
         int bytes = send(client, &buffer[tot], buffer_size-tot, 0);
-        //printf("Bytes sent: %d\n", bytes);
         if (bytes < 0) {
             printf("Error sending data to server. Terminating.\n");
             close_application(1);
@@ -116,4 +127,10 @@ int send_chunk(char* buffer, int buffer_size) {
         tot += bytes;
     }
     return tot;
-} 
+}
+
+float calc_remaining_time(int size, int progress, int last_progress, long time) {
+    int remaining = size-progress;
+    int prog = progress-last_progress;
+    return (float)(remaining / prog) * time * 0.001;
+}

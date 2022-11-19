@@ -1,13 +1,13 @@
-#include <stdio.h>
 #include "connector.h"
 #include "filehandler.h"
+#include <time.h>
 
-
-
+#define CLOCK_INTERVAL 1000
 SOCKET init_conn();
 long wait_for_file_size(SOCKET s);
 void wait_for_file_name(SOCKET s, char** dest_ptr);
 int recv_chunk(SOCKET s, char* buffer, int buffer_size);
+float calc_remaining_time(int size, int progress, int last_progress, long time);
 
 int main() {
     initialize_winsocks();
@@ -49,13 +49,15 @@ int main() {
     free(file_name);
 
     long progress = 0;
+    long last_progress = 0;
     int bytes_received = 0;
     unsigned char buffer[BUFF_LEN];
-    long start = time(NULL);
-
+    clock_t start, stop;
+    start = clock();
+    stop = clock();
     while(progress < size) {
         //bytes_received = recv_chunk(client, buffer, min(BUFF_LEN, size-progress));
-        int bytes_received = recv(client, buffer, min(BUFF_LEN, size-progress), 0);
+        bytes_received = recv(client, buffer, min(BUFF_LEN, size-progress), 0);
         if(bytes_received <= 0) {
             if (bytes_received < 0) {
                 printf("Error at socket(): %ld\n", WSAGetLastError());
@@ -67,17 +69,22 @@ int main() {
             break;
         };
         progress += bytes_received;
-        if (time(NULL) > start) {
-            printf("\rReceiving files, %.2f%%", ((double)(progress) / (double)size * 100));
-            start = time(NULL);
+        if (clock() > (stop + CLOCK_INTERVAL)) {
+            float remaining_time = calc_remaining_time(size, progress, last_progress, clock() - stop);
+            printf("\rReceiving files, %.2f%%, estimated time: %.2fs                      ", ((double)(progress) / (double)size * 100), remaining_time);
+            stop = clock();
+            last_progress = progress;
         }
-        //memset(buffer, 0, sizeof(buffer));
     }
+    stop = clock();
     int bytes = send(client, (char*)1, 1, 0);
-    printf("\rReceiving files, 100%%    \n");
+    printf("\rReceiving files, 100%%                                             \n");
+    printf("Elapsed time: %.2fs", (stop-start)*0.001);
     close_socket(client);
     close_socket(host);
     fclose(output);
+    printf("Press enter to quit...");
+    getchar();
     return 0;
 }
 
@@ -96,10 +103,8 @@ void wait_for_file_name(SOCKET s, char** dest_ptr) {
 
 int recv_chunk(SOCKET s, char* buffer, int buffer_size) {
     int tot = 0;
-    //printf("buffer: %d\n", buffer_size);
     while(tot < buffer_size) {
         int recv_bytes = recv(s, &buffer[tot], buffer_size-tot, 0);
-        //printf("Bytes received: %d\n", recv_bytes);
         if (recv_bytes <= 0) {
             return tot;
         }
@@ -107,4 +112,10 @@ int recv_chunk(SOCKET s, char* buffer, int buffer_size) {
         tot += recv_bytes;
     }
     return tot;
+}
+
+float calc_remaining_time(int size, int progress, int last_progress, long time) {
+    int remaining = size-progress;
+    int prog = progress-last_progress;
+    return (float)(remaining / prog) * time * 0.001;
 }
