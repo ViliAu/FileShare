@@ -52,21 +52,6 @@ int main() {
     int bytes_received = 0;
     unsigned char buffer[BUFF_LEN];
     long start = time(NULL);
-    /*
-    while(progress > 0) {
-        bytes_received = (recv_chunk(client, buffer, BUFF_LEN));
-        if(bytes_received < 0) {
-            printf("Error at socket(): %ld\n", WSAGetLastError());
-            break;
-        }
-        fwrite(buffer, 1, bytes_received, output);
-        progress -= bytes_received;
-        if (time(NULL) > start) {
-            printf("\rReceiving files, %.2f%%", ((double)(size-progress) / (double)size * 100));
-            start = time(NULL);
-        }
-    }
-    */
 
     while(progress < size) {
         //bytes_received = recv_chunk(client, buffer, min(BUFF_LEN, size-progress));
@@ -82,7 +67,6 @@ int main() {
             break;
         };
         progress += bytes_received;
-        printf("%d\n, progress");
         if (time(NULL) > start) {
             printf("\rReceiving files, %.2f%%", ((double)(progress) / (double)size * 100));
             start = time(NULL);
@@ -96,17 +80,6 @@ int main() {
     fclose(output);
     return 0;
 }
-
-/* TODO: Error checking 
-SOCKET init_conn() {
-    initialize_winsocks();
-    SOCKET host = create_host_socket(DEFAULT_PORT, 1, 1);
-    listen_socket(host, 1);
-    printf("Listening to socket\n");
-
-    SOCKET client = accept_connection(host);
-    return client;
-}*/
 
 long wait_for_file_size(SOCKET s) {
     long l;
@@ -122,18 +95,16 @@ void wait_for_file_name(SOCKET s, char** dest_ptr) {
 }
 
 int recv_chunk(SOCKET s, char* buffer, int buffer_size) {
-    int i = 0;
-    printf("buffer: %d\n", buffer_size);
-    //int lc = 0;
-    while(i < buffer_size) {
-        //lc++;
-        int recv_bytes = recv(s, &buffer[i], buffer_size-i, 0);
-        printf("Bytes received: %d\n", recv_bytes);
+    int tot = 0;
+    //printf("buffer: %d\n", buffer_size);
+    while(tot < buffer_size) {
+        int recv_bytes = recv(s, &buffer[tot], buffer_size-tot, 0);
+        //printf("Bytes received: %d\n", recv_bytes);
         if (recv_bytes <= 0) {
-            return recv_bytes;
+            return tot;
         }
         int sent_bytes = send(s, (char *)&recv_bytes, sizeof(int), 0);
-        i += recv_bytes;
+        tot += recv_bytes;
     }
-    return i;
+    return tot;
 }
