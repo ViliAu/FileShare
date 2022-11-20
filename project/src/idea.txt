@@ -1,8 +1,0 @@
-- Käynnistyksee filukka listener
-- Regedittii oma context menu entry filukan lähettämiselle
-- Regeditti lähettää softalle komentoriviparametrina tied. sijainnin
-- Softa muodostaa connectionin listenerii ja br tiedostoa sijainnissa
-- lähettää tiedoston listenerii
-- terminate connection
-- configgi tulille
-- reg: */shell/Send/command; command key val: [POLKU] + "%1"
